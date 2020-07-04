@@ -569,7 +569,10 @@ class DynamicDKittyEnv(gym.Wrapper, utils.EzPickle):
         utils.EzPickle.__init__(self)
 
     def reset(self, **kwargs):
-        design = sample_uniformly() \
-            if self.fixed_design is None else self.fixed_design
-        gym.Wrapper.__init__(self, DKittyWalkFixed(design=design, **self.kwargs))
-        return self.env.reset(**kwargs)
+        try:
+            design = sample_uniformly() \
+                if self.fixed_design is None else self.fixed_design
+            gym.Wrapper.__init__(self, DKittyWalkFixed(design=design, **self.kwargs))
+            return self.env.reset(**kwargs)
+        except AssertionError:
+            return self.reset(**kwargs)
