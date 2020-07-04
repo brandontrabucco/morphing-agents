@@ -12,7 +12,7 @@ pip install git+http://github.com/brandontrabucco/morphing-agents.git
 
 # Usage
 
-At this time I have created three agents with dynamic morphologies. You can instantiate themlike this.
+At this time I have created three agents with dynamic morphologies. You can instantiate them like this.
 
 ```python
 import morphing_agents.mujoco as agents
