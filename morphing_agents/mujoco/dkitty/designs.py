@@ -5,7 +5,7 @@ from typing import List, NamedTuple
 import numpy as np
 
 
-DEFAULT_DKITTY = (
+DEFAULT_DESIGN = (
     LEG(x=0,
         y=0,
         z=0,

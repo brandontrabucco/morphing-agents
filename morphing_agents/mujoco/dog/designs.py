@@ -5,7 +5,7 @@ from typing import List, NamedTuple
 import numpy as np
 
 
-DEFAULT_DOG = (
+DEFAULT_DESIGN = (
     LEG(x=-0.4,
         y=-0.2,
         z=0.0,

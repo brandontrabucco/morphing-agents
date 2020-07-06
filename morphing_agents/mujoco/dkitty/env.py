@@ -1,4 +1,4 @@
-from morphing_agents.mujoco.dkitty.designs import DEFAULT_DKITTY
+from morphing_agents.mujoco.dkitty.designs import DEFAULT_DESIGN
 from morphing_agents.mujoco.dkitty.designs import sample_uniformly
 from morphing_agents.mujoco.utils import load_xml_tree
 from typing import Dict, Optional, Sequence, Tuple, Union
@@ -53,7 +53,7 @@ class DKittyEnv(BaseDKittyEnv):
 
     def __init__(self,
                  sim_model,
-                 design=DEFAULT_DKITTY,
+                 design=DEFAULT_DESIGN,
                  **kwargs):
         self.design = np.concatenate(design)
         self._legs = design
@@ -560,7 +560,7 @@ class DKittyWalkRandomDynamics(DKittyWalkRandom):
         super()._reset()
 
 
-class DynamicDKittyEnv(gym.Wrapper, utils.EzPickle):
+class MorphingDKittyEnv(gym.Wrapper, utils.EzPickle):
 
     def __init__(self, fixed_design=None, **kwargs):
         self.fixed_design = fixed_design

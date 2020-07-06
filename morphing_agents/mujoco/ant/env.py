@@ -1,5 +1,5 @@
 from morphing_agents.mujoco.ant.designs import sample_uniformly
-from morphing_agents.mujoco.ant.designs import DEFAULT_ANT
+from morphing_agents.mujoco.ant.designs import DEFAULT_DESIGN
 from gym import utils
 from gym.envs.mujoco import mujoco_env
 import numpy as np
@@ -11,7 +11,7 @@ import gym
 
 class AntEnv(mujoco_env.MujocoEnv, utils.EzPickle):
 
-    def __init__(self, design=DEFAULT_ANT, expose_design=True):
+    def __init__(self, design=DEFAULT_DESIGN, expose_design=True):
         self.design = np.concatenate(design)
         self.expose_design = expose_design
 
@@ -171,7 +171,7 @@ class AntEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         self.viewer.cam.distance = self.model.stat.extent * 0.5
 
 
-class DynamicAntEnv(gym.Wrapper, utils.EzPickle):
+class MorphingAntEnv(gym.Wrapper, utils.EzPickle):
 
     def __init__(self, num_legs=4, fixed_design=None, **kwargs):
         self.num_legs = num_legs
