@@ -14,10 +14,10 @@ LEG = namedtuple("LEG", [
     "c",
     "hip_upper",
     "hip_lower",
-    "thigh_lower",
     "thigh_upper",
-    "ankle_lower",
+    "thigh_lower",
     "ankle_upper",
+    "ankle_lower",
     "thigh_size",
     "ankle_size"])
 
