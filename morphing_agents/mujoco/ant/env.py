@@ -53,7 +53,7 @@ class AntEnv(mujoco_env.MujocoEnv, utils.EzPickle):
                 axis="-1 1 0",
                 name=f"hip_{i}_joint",
                 pos="0.0 0.0 0.0",
-                range=f"{leg.hip_lower} {leg.hip_upper}",
+                range=f"{leg.hip_center - leg.hip_range} {leg.hip_center + leg.hip_range}",
                 type="hinge")
 
             ET.SubElement(
@@ -62,7 +62,7 @@ class AntEnv(mujoco_env.MujocoEnv, utils.EzPickle):
                 axis="0 0 1",
                 name=f"thigh_{i}_joint",
                 pos="0.0 0.0 0.0",
-                range=f"{leg.thigh_lower} {leg.thigh_upper}",
+                range=f"{leg.thigh_center - leg.thigh_upper} {leg.thigh_center + leg.thigh_upper}",
                 type="hinge")
 
             ET.SubElement(
@@ -85,7 +85,7 @@ class AntEnv(mujoco_env.MujocoEnv, utils.EzPickle):
                 axis="-1 1 0",
                 name=f"ankle_{i}_joint",
                 pos="0.0 0.0 0.0",
-                range=f"{leg.ankle_lower} {leg.ankle_upper}",
+                range=f"{leg.ankle_center - leg.ankle.range} {leg.ankle_center + leg.ankle.range}",
                 type="hinge")
 
             ET.SubElement(
