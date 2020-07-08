@@ -1,5 +1,5 @@
 from morphing_agents.mujoco.ant.designs import sample_curated
-from morphing_agents.mujoco.dog.designs import sample_uniformly
+from morphing_agents.mujoco.ant.designs import sample_uniformly
 from morphing_agents.mujoco.ant.designs import DEFAULT_DESIGN
 from gym import utils
 from gym.envs.mujoco import mujoco_env
@@ -54,7 +54,8 @@ class AntEnv(mujoco_env.MujocoEnv, utils.EzPickle):
                 axis="-1 1 0",
                 name=f"hip_{i}_joint",
                 pos="0.0 0.0 0.0",
-                range=f"{leg.hip_center - leg.hip_range} {leg.hip_center + leg.hip_range}",
+                range=f"{leg.hip_center - leg.hip_range} "
+                      f"{leg.hip_center + leg.hip_range}",
                 type="hinge")
 
             ET.SubElement(
@@ -63,7 +64,8 @@ class AntEnv(mujoco_env.MujocoEnv, utils.EzPickle):
                 axis="0 0 1",
                 name=f"thigh_{i}_joint",
                 pos="0.0 0.0 0.0",
-                range=f"{leg.thigh_center - leg.thigh_upper} {leg.thigh_center + leg.thigh_upper}",
+                range=f"{leg.thigh_center - leg.thigh_range} "
+                      f"{leg.thigh_center + leg.thigh_range}",
                 type="hinge")
 
             ET.SubElement(
@@ -86,7 +88,8 @@ class AntEnv(mujoco_env.MujocoEnv, utils.EzPickle):
                 axis="-1 1 0",
                 name=f"ankle_{i}_joint",
                 pos="0.0 0.0 0.0",
-                range=f"{leg.ankle_center - leg.ankle.range} {leg.ankle_center + leg.ankle.range}",
+                range=f"{leg.ankle_center - leg.ankle_range} "
+                      f"{leg.ankle_center + leg.ankle_range}",
                 type="hinge")
 
             ET.SubElement(

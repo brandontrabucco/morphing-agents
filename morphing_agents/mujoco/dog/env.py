@@ -39,7 +39,8 @@ class DogEnv(mujoco_env.MujocoEnv, utils.EzPickle):
                 axis="1 0 0",
                 name=f"hip_{i}_joint",
                 pos="0.0 0.0 0.0",
-                range=f"{leg.hip_center - leg.hip_range} {leg.hip_center + leg.hip_range}",
+                range=f"{leg.hip_center - leg.hip_range} "
+                      f"{leg.hip_center + leg.hip_range}",
                 type="hinge")
 
             ET.SubElement(
@@ -48,7 +49,8 @@ class DogEnv(mujoco_env.MujocoEnv, utils.EzPickle):
                 axis="0 1 0",
                 name=f"thigh_{i}_joint",
                 pos="0.0 0.0 0.0",
-                range=f"{leg.thigh_center - leg.thigh_range} {leg.thigh_center + leg.thigh_range}",
+                range=f"{leg.thigh_center - leg.thigh_range} "
+                      f"{leg.thigh_center + leg.thigh_range}",
                 type="hinge")
 
             ET.SubElement(
@@ -71,7 +73,8 @@ class DogEnv(mujoco_env.MujocoEnv, utils.EzPickle):
                 axis="0 1 0",
                 name=f"ankle_{i}_joint",
                 pos="0.0 0.0 0.0",
-                range=f"{leg.ankle_center - leg.ankle_range} {leg.ankle_center + leg.ankle_range}",
+                range=f"{leg.ankle_center - leg.ankle_range} "
+                      f"{leg.ankle_center + leg.ankle_range}",
                 type="hinge")
 
             ET.SubElement(
