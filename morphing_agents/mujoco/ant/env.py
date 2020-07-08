@@ -1,4 +1,5 @@
-from morphing_agents.mujoco.ant.designs import sample_uniformly
+from morphing_agents.mujoco.ant.designs import sample_curated
+from morphing_agents.mujoco.dog.designs import sample_uniformly
 from morphing_agents.mujoco.ant.designs import DEFAULT_DESIGN
 from gym import utils
 from gym.envs.mujoco import mujoco_env
@@ -173,17 +174,26 @@ class AntEnv(mujoco_env.MujocoEnv, utils.EzPickle):
 
 class MorphingAntEnv(gym.Wrapper, utils.EzPickle):
 
-    def __init__(self, num_legs=4, fixed_design=None, **kwargs):
+    def __init__(self,
+                 num_legs=4,
+                 fixed_design=None,
+                 curated=True,
+                 **kwargs):
         self.num_legs = num_legs
         self.fixed_design = fixed_design
+        self.curated = curated
         self.kwargs = kwargs
         self.reset()
         utils.EzPickle.__init__(self)
 
     def reset(self, **kwargs):
         try:
-            design = sample_uniformly(num_legs=self.num_legs) \
-                if self.fixed_design is None else self.fixed_design
+            if self.fixed_design is None and self.curated:
+                design = sample_curated()
+            elif self.fixed_design is None:
+                design = sample_uniformly(num_legs=self.num_legs)
+            else:
+                design = self.fixed_design
             gym.Wrapper.__init__(self, AntEnv(design=design, **self.kwargs))
             return self.env.reset(**kwargs)
         except AssertionError:
