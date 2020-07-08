@@ -16,9 +16,9 @@ At this time I have created three agents with dynamic morphologies. You can inst
 
 ```python
 import morphing_agents.mujoco as agents
-env0 = agents.DynamicAntEnv(num_legs=4, expose_design=True)
-env1 = agents.DynamicDogEnv(num_legs=4, expose_design=True)
-env2 = agents.DynamicDKittyEnv(expose_design=True)
+env0 = agents.MorphingAntEnv(num_legs=4, expose_design=True)
+env1 = agents.MorphingDogEnv(num_legs=4, expose_design=True)
+env2 = agents.MorphingDKittyEnv(expose_design=True)
 ```
 
 These environments inherit from `gym.Env` and can be used as such. The parameter `num_legs` determines the number of legs in the agent's design specification, which is sampled at random at the beginning of an episode. The parameter `expose_design` vectorizes the design specification and concatenates it with the observation.

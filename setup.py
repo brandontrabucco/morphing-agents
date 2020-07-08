@@ -8,4 +8,4 @@ setup(
     description='A Collecting Of Dynamic Morphology Agents',
     include_package_data=True,
     packages=find_packages(),
-    install_requires=['gym==0.17.2', 'numpy', 'mujoco_py', 'robel'])
+    install_requires=['gym', 'numpy', 'mujoco_py', 'robel'])
