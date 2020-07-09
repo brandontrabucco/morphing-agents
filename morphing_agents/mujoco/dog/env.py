@@ -109,11 +109,14 @@ class DogEnv(mujoco_env.MujocoEnv, utils.EzPickle):
                 joint=f"ankle_{i}_joint",
                 gear="150")
 
-        _, file_path = tempfile.mkstemp(text=True, suffix='.xml')
+        fd, file_path = tempfile.mkstemp(text=True, suffix='.xml')
         tree.write(file_path)
 
         mujoco_env.MujocoEnv.__init__(self, file_path, 5)
         utils.EzPickle.__init__(self)
+
+        os.close(fd)
+        os.remove(file_path)
 
     def step(self, a):
         xposbefore = self.get_body_com("torso")[0]

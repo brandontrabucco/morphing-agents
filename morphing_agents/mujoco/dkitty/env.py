@@ -190,12 +190,14 @@ class DKittyEnv(BaseDKittyEnv):
         ankle_ctrl.attrib['ctrlrange'] = f"{spec.ankle_center - spec.ankle_range} " \
                                          f"{spec.ankle_center + spec.ankle_range}"
 
-        _, file_path = tempfile.mkstemp(text=True,
-                                        suffix='.xml',
-                                        dir=os.path.dirname(sim_model))
+        fd, file_path = tempfile.mkstemp(text=True,
+                                         suffix='.xml',
+                                         dir=os.path.dirname(sim_model))
         tree.write(file_path)
-
         super().__init__(file_path, **kwargs)
+
+        os.close(fd)
+        os.remove(file_path)
 
     # Copyright 2019 The ROBEL Authors.
     #
