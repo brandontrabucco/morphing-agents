@@ -166,11 +166,15 @@ class MorphingDogEnv(gym.Wrapper, utils.EzPickle):
                  num_legs=4,
                  fixed_design=None,
                  curated=True,
+                 retry_at_fail=False,
                  **kwargs):
+
         self.num_legs = num_legs
         self.fixed_design = fixed_design
         self.curated = curated
+        self.retry_at_fail = retry_at_fail
         self.kwargs = kwargs
+
         self.reset()
         utils.EzPickle.__init__(self)
 
@@ -182,7 +186,13 @@ class MorphingDogEnv(gym.Wrapper, utils.EzPickle):
                 design = sample_uniformly(num_legs=self.num_legs)
             else:
                 design = self.fixed_design
+
             gym.Wrapper.__init__(self, DogEnv(design=design, **self.kwargs))
             return self.env.reset(**kwargs)
-        except AssertionError:
-            return self.reset(**kwargs)
+
+        except AssertionError as e:
+            if self.retry_at_fail:
+                return self.reset(**kwargs)
+            else:
+                raise e
+
