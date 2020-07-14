@@ -613,6 +613,7 @@ class MorphingDKittyEnv(gym.Wrapper, utils.EzPickle):
         self.curated = curated
         self.retry_at_fail = retry_at_fail
         self.kwargs = kwargs
+        self.is_initialized = False
 
         self.reset()
         utils.EzPickle.__init__(self)
@@ -626,7 +627,10 @@ class MorphingDKittyEnv(gym.Wrapper, utils.EzPickle):
             else:
                 design = self.fixed_design
 
-            gym.Wrapper.__init__(self, DKittyWalkFixed(design=design, **self.kwargs))
+            if self.fixed_design is None or not self.is_initialized:
+                gym.Wrapper.__init__(self, DKittyWalkFixed(design=design, **self.kwargs))
+
+            self.is_initialized = True
             return self.env.reset(**kwargs)
 
         except AssertionError as e:
