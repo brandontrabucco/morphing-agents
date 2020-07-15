@@ -18,13 +18,18 @@ def load_xml_tree(xml_path):
     """
 
     with open(xml_path, "r") as f:
+
         root = ET.fromstringlist(f.readlines()[16:])
+
         for c in root.findall(".//include"):
             file = c.attrib['file']
             target = os.path.join(os.path.dirname(xml_path), file)
+
             p = root.find(f".//include[@file='{file}']...")
             i = list(p).index(c)
             p.remove(c)
+
             for s in reversed(load_xml_tree(target)):
                 p.insert(i, s)
+
         return root
