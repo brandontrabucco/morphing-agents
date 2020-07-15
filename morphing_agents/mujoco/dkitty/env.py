@@ -68,7 +68,7 @@ class DKittyEnv(BaseDKittyEnv):
 
         obs, reward, done, info = BaseDKittyEnv.step(self, a)
         info = {key: value for key, value in info.items() if np.isscalar(value)}
-        done = not np.isfinite(obs).all()
+        done = not np.isfinite(obs).all() or done
         return obs, reward, done, info
 
     def __init__(self,
@@ -109,7 +109,7 @@ class DKittyEnv(BaseDKittyEnv):
         root = tree.getroot()
 
         # fix when many sims are running
-        ET.SubElement(root, "size", njmax="1200")
+        ET.SubElement(root, "size", njmax="2000")
 
         # modify settings for Front Right Leg
         spec = design[0]
