@@ -34,7 +34,7 @@ LEG_UPPER_BOUND = LEG(
     thigh_center=PI,
     thigh_range=PI / 4,
     ankle_center=PI,
-    ankle_range=PI / 4,
+    ankle_range=PI / 2,
     thigh_size=0.1365,
     ankle_size=0.1345)
 
