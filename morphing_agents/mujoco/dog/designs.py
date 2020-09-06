@@ -3,7 +3,6 @@ from morphing_agents.mujoco.dog.elements import LEG_UPPER_BOUND
 from morphing_agents.mujoco.dog.elements import LEG_LOWER_BOUND
 from typing import List, NamedTuple
 import numpy as np
-import random
 
 
 DEFAULT_DESIGN = (
@@ -65,63 +64,48 @@ DEFAULT_DESIGN = (
         ankle_size=0.4))
 
 
-CURATED_DESIGNS = [
-    DEFAULT_DESIGN,
-    [LEG(x=0.1695815597416378, y=-0.047775330757798995, z=0.12022898881552524, a=-62.23670893338317,
-         b=112.53903103254817, c=-97.18527437233408, hip_center=28.689445592836933, hip_range=5.979252301404984,
-         thigh_center=43.71886439160784, thigh_range=2.188853439867522, ankle_center=-116.99910188932412,
-         ankle_range=32.99690484476074, thigh_size=0.20899272510214206, ankle_size=0.31237732523515693),
-     LEG(x=0.16230014453627084, y=0.13998141425824712, z=-0.15987432026096426, a=15.255659908805029,
-         b=29.25059576433725, c=12.213521048186635, hip_center=-139.3475282634837, hip_range=36.924405612060326,
-         thigh_center=98.10840518428802, thigh_range=21.799638889443372, ankle_center=-52.07172644636239,
-         ankle_range=7.700875451414307, thigh_size=0.2530397362791276, ankle_size=0.29559437086025686),
-     LEG(x=0.39807575386388006, y=0.17897706899280647, z=0.021490626891045667, a=150.02492724883746,
-         b=-167.80620760656498, c=-60.010447013884246, hip_center=23.04153264668767, hip_range=15.255313135707382,
-         thigh_center=131.66979995940778, thigh_range=0.9087728691514557, ankle_center=113.99353218991092,
-         ankle_range=39.23061061703571, thigh_size=0.20156670999278295, ankle_size=0.399186732070554),
-     LEG(x=0.26051532250112364, y=0.18714263877053477, z=0.013063613912536132, a=104.50304228098298,
-         b=36.84494968444281, c=43.95592633501809, hip_center=23.561135983906723, hip_range=20.891021801078278,
-         thigh_center=125.64359106050495, thigh_range=4.299038399942966, ankle_center=-30.651862753129734,
-         ankle_range=31.509063967439985, thigh_size=0.37059250253036186, ankle_size=0.351209285560829)],
-    [LEG(x=-0.06789785191303627, y=0.10457777912306732, z=0.07937172983769436, a=133.39767505716736,
-         b=-48.35354321954105, c=82.96763913347536, hip_center=-1.5792758866452914, hip_range=18.609284376807565,
-         thigh_center=18.90216176056296, thigh_range=31.300172019540934, ankle_center=-122.27898795611863,
-         ankle_range=8.26744253826361, thigh_size=0.30547675857411083, ankle_size=0.37315194146668),
-     LEG(x=-0.13587043963530604, y=-0.006676595439067734, z=-0.014147555935642986, a=127.37725372452365,
-         b=-102.062900958059, c=-109.82763051894645, hip_center=55.02381352407542, hip_range=13.718385816142561,
-         thigh_center=-98.7691009621248, thigh_range=16.082316510696153, ankle_center=93.06101062258688,
-         ankle_range=41.84725889179884, thigh_size=0.38956343391344306, ankle_size=0.3688552536087496),
-     LEG(x=0.2828500857417805, y=-0.0526859647208644, z=-0.16246275065378699, a=-157.95192763721028,
-         b=-125.1607240751388, c=-121.6831258241404, hip_center=-24.77327207089084, hip_range=43.195745135746186,
-         thigh_center=105.54542171414619, thigh_range=8.95946001053865, ankle_center=-27.91557704881035,
-         ankle_range=30.58038257647706, thigh_size=0.26241189392045744, ankle_size=0.21770765580752025),
-     LEG(x=-0.38244131825474226, y=-0.01608818059175418, z=0.013367518688358476, a=57.353589341368206,
-         b=-5.852390542461336, c=-108.14022789349073, hip_center=66.61963185847571, hip_range=31.573739173352113,
-         thigh_center=-33.26592215421806, thigh_range=29.360347764282814, ankle_center=-76.36316109031891,
-         ankle_range=0.5688331872088753, thigh_size=0.38435092274482174, ankle_size=0.2305309509909578)],
-    [LEG(x=0.3521657616252758, y=-0.1076609724939929, z=0.08019075626252359, a=132.250387065807, b=110.73900340581349,
-         c=169.35253846852544, hip_center=146.0378519864296, hip_range=16.231960065975912,
-         thigh_center=-132.146312644712, thigh_range=35.53804407275199, ankle_center=-168.83525708270432,
-         ankle_range=44.06023549462874, thigh_size=0.3671862311783583, ankle_size=0.38398029960672087),
-     LEG(x=0.12336069145297068, y=-0.05125316958462975, z=-0.17181051114602833, a=-92.95191028564744,
-         b=-32.957337646885605, c=29.647116493505337, hip_center=-65.68293184447442, hip_range=13.166585567429328,
-         thigh_center=-20.79422012601708, thigh_range=43.79748167667295, ankle_center=14.374293804966356,
-         ankle_range=33.116259915812414, thigh_size=0.3844713578535363, ankle_size=0.3364713799835315),
-     LEG(x=0.1078034221082621, y=-0.16709579199759578, z=0.07819059655428917, a=129.8312588732473, b=44.09926031102833,
-         c=-119.41718941372466, hip_center=5.507754606589913, hip_range=14.964618202267458,
-         thigh_center=-86.31914679648095, thigh_range=0.6185758591825807, ankle_center=-6.919852983395998,
-         ankle_range=28.408070858552925, thigh_size=0.21227546844470077, ankle_size=0.36292716349211956),
-     LEG(x=-0.16031136332082632, y=-0.026177816142676807, z=0.03785502383882661, a=-165.90449925286856,
-         b=129.94901149130118, c=-55.067491216823015, hip_center=61.90609627963852, hip_range=8.842249175012935,
-         thigh_center=83.21719885489478, thigh_range=3.511064396502725, ankle_center=90.285956518197,
-         ankle_range=18.950928725109776, thigh_size=0.34362776388576277, ankle_size=0.26610967208684755)]]
-
-
 def sample_uniformly(num_legs=4) -> List[NamedTuple]:
+    """Sample new designs uniformly from the design space with the
+    provided number of legs
+
+    Args:
+
+    num_legs: int
+        the number of legs in the agent, used if fixed_design is None
+
+    Returns:
+
+    design: list
+        a list of design elements, which are named tuples such as
+        [LEG(x=0, y=0, z=0, a=0, b=0, c=0, ...), ...]
+    """
+
     return [LEG(*np.random.uniform(
         low=LEG_LOWER_BOUND, high=LEG_UPPER_BOUND))
         for n in range(num_legs)]
 
 
-def sample_curated() -> List[NamedTuple]:
-    return random.choice(CURATED_DESIGNS)
+def sample_centered(noise_std=0.125,
+                    center=DEFAULT_DESIGN) -> List[NamedTuple]:
+    """Sample new designs uniformly from the design space with the
+    provided number of legs
+
+    Args:
+
+    noise_std: float
+        a fraction of the design space the noise std takes
+    center: list
+        a default morphology centered morphologies are sampled from
+
+    Returns:
+
+    design: list
+        a list of design elements, which are named tuples such as
+        [LEG(x=0, y=0, z=0, a=0, b=0, c=0, ...), ...]
+    """
+
+    ub = np.array(list(LEG_UPPER_BOUND))
+    lb = np.array(list(LEG_LOWER_BOUND))
+    return [LEG(*np.clip(
+        np.array(leg) + np.random.normal(0, (ub - lb) / 2) * noise_std,
+        lb, ub)) for leg in center]

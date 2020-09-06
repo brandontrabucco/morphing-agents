@@ -1,7 +1,8 @@
 from morphing_agents.mujoco.dkitty.designs import DEFAULT_DESIGN
-from morphing_agents.mujoco.dkitty.designs import sample_curated
+from morphing_agents.mujoco.dkitty.designs import sample_centered
 from morphing_agents.mujoco.dkitty.designs import sample_uniformly
 from morphing_agents.mujoco.utils import load_xml_tree
+
 from typing import Dict, Optional, Sequence, Tuple, Union
 from robel.dkitty.base_env import BaseDKittyEnv
 from robel.dkitty.base_env import DEFAULT_DKITTY_CALIBRATION_MAP
@@ -12,12 +13,13 @@ from robel.utils.configurable import configurable
 from robel.utils.math_utils import calculate_cosine
 from robel.utils.resources import get_asset_path
 from gym import utils
+
 import abc
+import xml.etree.ElementTree as ET
 import numpy as np
 import os
 import tempfile
 import collections
-import xml.etree.ElementTree as ET
 import gym
 
 
@@ -34,8 +36,7 @@ DEFAULT_OBSERVATION_KEYS = (
     'last_action',
     'upright',
     'heading',
-    'target_error',
-    'design')
+    'target_error')
 
 
 PI = np.pi
@@ -45,26 +46,70 @@ class DKittyEnv(BaseDKittyEnv):
     """Base environment for all DKitty morphology tasks."""
 
     def step(self, a):
-        """Hack to get the env to work with softlearning, which assumes
-        the info dict contains only scalars"""
+        """This is a hack to prevent agents with morphologies that require
+        jumping or crawling from terminating early
 
-        o, r, d, i = super().step(a)
-        i = {key: value for key, value in i.items() if np.isscalar(value)}
-        return o, r, d, i
+        Args:
+
+        a: np.ndarray
+            an array corresponding to actions for each design element
+
+        Returns:
+
+        obs: np.ndarray
+            an array corresponding to observations for each design element
+        reward: float
+            a reward that encourages the agent to run as fast as possible
+        done: bool
+            a boolean that specifies if the agent has died
+        info: dict
+            extra statistics for measuring components of the reward
+        """
+
+        obs, reward, done, info = BaseDKittyEnv.step(self, a)
+        info = {key: value for key, value in info.items() if np.isscalar(value)}
+        done = not np.isfinite(obs).all() or done
+        return obs, reward, done, info
 
     def __init__(self,
                  sim_model,
                  design=DEFAULT_DESIGN,
+                 expose_design=True,
+                 observation_keys: Sequence[str] = DEFAULT_OBSERVATION_KEYS,
                  **kwargs):
-        self.design = np.concatenate(design)
+        """Build a DKitty environment that has a parametric design for training
+        morphology-conditioned agents
+
+        Args:
+
+        asset_path: str
+            The XML model file to load.
+        observation_keys: Sequence[str]
+            The keys in `get_obs_dict` to concatenate as the
+            observations returned by `step` and `reset`.
+        design: list
+            a list of dog design elements, which are named tuples such as
+            [LEG(x=0, y=0, z=0, a=0, b=0, c=0, ...), ...]
+        expose_design: bool
+            a boolean that indicates whether the design parameters are to
+            be concatenated with the observation
+        """
+
+        # save the design parameters as a vectorized array
         self._legs = design
+        self.design = np.concatenate(design)
+
+        # set design to be in observation keys
+        observation_keys = list(observation_keys)
+        if expose_design:
+            observation_keys.append('design')
 
         assert len(design) == 4, "dkitty must always have 4 legs"
         tree = ET.ElementTree(element=load_xml_tree(sim_model))
         root = tree.getroot()
 
         # fix when many sims are running
-        ET.SubElement(root, "size", njmax="1200")
+        ET.SubElement(root, "size", njmax="2000")
 
         # modify settings for Front Right Leg
         spec = design[0]
@@ -190,28 +235,22 @@ class DKittyEnv(BaseDKittyEnv):
         ankle_ctrl.attrib['ctrlrange'] = f"{spec.ankle_center - spec.ankle_range} " \
                                          f"{spec.ankle_center + spec.ankle_range}"
 
+        # make a temporary xml file and write the agent to it
         fd, file_path = tempfile.mkstemp(text=True,
                                          suffix='.xml',
                                          dir=os.path.dirname(sim_model))
         tree.write(file_path)
-        super().__init__(file_path, **kwargs)
 
+        # build the mujoco environment
+        super().__init__(file_path, observation_keys=observation_keys, **kwargs)
+
+        # remove the temporary file
         os.close(fd)
         os.remove(file_path)
 
-    # Copyright 2019 The ROBEL Authors.
-    #
-    # Licensed under the Apache License, Version 2.0 (the "License");
-    # you may not use this file except in compliance with the License.
-    # You may obtain a copy of the License at
-    #
-    #     http://www.apache.org/licenses/LICENSE-2.0
-    #
-    # Unless required by applicable law or agreed to in writing, software
-    # distributed under the License is distributed on an "AS IS" BASIS,
-    # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    # See the License for the specific language governing permissions and
-    # limitations under the License.
+    def _get_default_obs(self) -> Dict[str, np.ndarray]:
+        """Returns a dictionary of default observations."""
+        return {'design': self.design}
 
     def _configure_robot(self, builder: RobotComponentBuilder):
         """Configures the robot component."""
@@ -352,7 +391,6 @@ class DKittyWalk(DKittyUprightEnv, metaclass=abc.ABCMeta):
                  upright_threshold: float = 0.9,
                  upright_reward: float = 1,
                  falling_reward: float = -500,
-                 expose_design=True,
                  **kwargs):
         """Initializes the environment.
         Args:
@@ -377,8 +415,6 @@ class DKittyWalk(DKittyUprightEnv, metaclass=abc.ABCMeta):
         if self._heading_tracker_id is None:
             self._heading_tracker_id = self._target_tracker_id
         observation_keys = list(observation_keys)
-        if not expose_design:
-            observation_keys.remove("design")
 
         super().__init__(
             sim_model=get_asset_path(asset_path),
@@ -461,6 +497,7 @@ class DKittyWalk(DKittyUprightEnv, metaclass=abc.ABCMeta):
         return collections.OrderedDict((
             # Add observation terms relating to being upright.
             *self._get_upright_obs(torso_track_state).items(),
+            *self._get_default_obs().items(),
             ('root_pos', torso_track_state.pos),
             ('root_euler', torso_track_state.rot_euler),
             ('root_vel', torso_track_state.vel),
@@ -471,7 +508,6 @@ class DKittyWalk(DKittyUprightEnv, metaclass=abc.ABCMeta):
             ('heading', heading),
             ('target_pos', target_xy),
             ('target_error', target_xy - kitty_xy),
-            ('design', self.design),
         ))
 
     def get_reward_dict(
@@ -604,33 +640,77 @@ class MorphingDKittyEnv(gym.Wrapper, utils.EzPickle):
     def __init__(self,
                  num_legs=4,
                  fixed_design=None,
-                 curated=True,
+                 centered=True,
+                 center=DEFAULT_DESIGN,
+                 noise_std=0.125,
                  retry_at_fail=False,
                  **kwargs):
+        """Wrap around DKittyWalkFixed and provide an interface for randomly
+        sampling the design every reset
+
+        Args:
+
+        num_legs: int
+            the number of legs in the agent, used if fixed_design is None
+        fixed_design: list
+            a static design that the agent is initialized with every reset
+        centered: bool
+            if random morphologies are centered around a default morphology
+        center: list
+            a default morphology centered morphologies are sampled from
+        noise_std: float
+            a fraction of the design space the noise std takes
+        retry_at_fail: bool
+            if a new design should be sampled if initialization fails
+        """
 
         self.num_legs = num_legs
         self.fixed_design = fixed_design
-        self.curated = curated
+        self.centered = centered
+        self.center = center
+        self.noise_std = noise_std
         self.retry_at_fail = retry_at_fail
         self.kwargs = kwargs
+        self.is_initialized = False
 
         self.reset()
         utils.EzPickle.__init__(self)
 
     def reset(self, **kwargs):
+        """Reset the inner environment and possibly rebuild that environment
+        if a new morphology is provided
+
+        Returns:
+
+        obs: np.ndarray
+            an array corresponding to observations for each design element
+        """
+
         try:
-            if self.fixed_design is None and self.curated:
-                design = sample_curated()
+
+            if self.fixed_design is None and self.centered:
+                self.is_initialized = False
+                design = sample_centered(
+                    noise_std=self.noise_std, center=self.center)
+
             elif self.fixed_design is None:
+                self.is_initialized = False
                 design = sample_uniformly(num_legs=self.num_legs)
+
             else:
                 design = self.fixed_design
 
-            gym.Wrapper.__init__(self, DKittyWalkFixed(design=design, **self.kwargs))
+            if not self.is_initialized:
+                self.is_initialized = True
+                gym.Wrapper.__init__(
+                    self, DKittyWalkFixed(design=design, **self.kwargs))
+
             return self.env.reset(**kwargs)
 
         except AssertionError as e:
+
             if self.retry_at_fail:
                 return self.reset(**kwargs)
+
             else:
                 raise e
