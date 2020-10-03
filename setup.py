@@ -34,7 +34,7 @@ setup(
     author='Brandon Trabucco',
     author_email='brandon@btrabucco.com',
     url='https://github.com/brandontrabucco/morphing-agents',
-    download_url='https://github.com/brandontrabucco/design-bench/archive/v1.tar.gz',
+    download_url='https://github.com/brandontrabucco/morphing-agents/archive/v1.tar.gz',
     keywords=['MuJoCo', 'Agents', 'Dynamic Morphology'],
     install_requires=INSTALL_REQUIRES,
     classifiers=CLASSIFIERS)
