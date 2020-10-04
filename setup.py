@@ -1,4 +1,10 @@
+from setuptools import find_packages
 from setuptools import setup
+
+
+F = 'README.md'
+with open(F, 'r') as readme:
+    LONG_DESCRIPTION = readme.read()
 
 
 INSTALL_REQUIRES = [
@@ -27,10 +33,14 @@ CLASSIFIERS = [
 
 setup(
     name='morphing-agents',
-    packages=['morphing_agents'],
+    packages=find_packages(include=['morphing_agents', 'morphing_agents.*']),
+    include_package_data=True,
+    package_data={'': ['*.xml']},
     version='1.0',
     license='MIT',
     description='Collection Of Dynamic Morphology Agents For MuJoCo',
+    long_description=LONG_DESCRIPTION,
+    long_description_content_type='text/markdown',
     author='Brandon Trabucco',
     author_email='brandon@btrabucco.com',
     url='https://github.com/brandontrabucco/morphing-agents',
