@@ -4,7 +4,7 @@ The majority of MuJoCo benchmarks involve an agent with a fixed morphology. In t
 
 # Installation
 
-You may install the package directly from PiPY using the following command.
+You may install the package directly from PyPI using the following command.
 
 ```bash
 pip install morphing-agents
