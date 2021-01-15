@@ -36,7 +36,7 @@ setup(
     packages=find_packages(include=['morphing_agents', 'morphing_agents.*']),
     include_package_data=True,
     package_data={'': ['*.xml']},
-    version='1.0',
+    version='1.1',
     license='MIT',
     description='Collection Of Dynamic Morphology Agents For MuJoCo',
     long_description=LONG_DESCRIPTION,
@@ -44,7 +44,7 @@ setup(
     author='Brandon Trabucco',
     author_email='brandon@btrabucco.com',
     url='https://github.com/brandontrabucco/morphing-agents',
-    download_url='https://github.com/brandontrabucco/morphing-agents/archive/v1.tar.gz',
+    download_url='https://github.com/brandontrabucco/morphing-agents/archive/v1_1.tar.gz',
     keywords=['MuJoCo', 'Agents', 'Dynamic Morphology'],
     install_requires=INSTALL_REQUIRES,
     classifiers=CLASSIFIERS)
