@@ -214,11 +214,7 @@ class DogEnv(mujoco_env.MujocoEnv, utils.EzPickle):
             an array corresponding to observations for each design element
         """
 
-        qpos = self.init_qpos + \
-               self.np_random.uniform(size=self.model.nq, low=-.1, high=.1)
-        qvel = self.init_qvel + \
-               self.np_random.randn(self.model.nv) * .1
-        self.set_state(qpos, qvel)
+        self.set_state(self.init_qpos, self.init_qvel)
         return self._get_obs()
 
 
