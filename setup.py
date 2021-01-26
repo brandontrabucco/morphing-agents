@@ -10,8 +10,9 @@ with open(F, 'r') as readme:
 INSTALL_REQUIRES = [
     'gym',
     'numpy',
-    'mujoco_py',
-    'robel']
+    'mujoco-py',
+    'robel',
+    'setuptools']
 
 
 CLASSIFIERS = [
@@ -33,10 +34,10 @@ CLASSIFIERS = [
 
 setup(
     name='morphing-agents',
-    packages=find_packages(include=['morphing_agents', 'morphing_agents.*']),
+    packages=find_packages(include=['morphing_agents']),
     include_package_data=True,
-    package_data={'': ['*.xml']},
-    version='1.2',
+    package_data={'morphing_agents': ['mujoco/ant/base.xml', 'mujoco/dog/base.xml']},
+    version='1.3',
     license='MIT',
     description='Collection Of Dynamic Morphology Agents For MuJoCo',
     long_description=LONG_DESCRIPTION,
@@ -44,7 +45,7 @@ setup(
     author='Brandon Trabucco',
     author_email='brandon@btrabucco.com',
     url='https://github.com/brandontrabucco/morphing-agents',
-    download_url='https://github.com/brandontrabucco/morphing-agents/archive/v1_2.tar.gz',
+    download_url='https://github.com/brandontrabucco/morphing-agents/archive/v1_3.tar.gz',
     keywords=['MuJoCo', 'Agents', 'Dynamic Morphology'],
     install_requires=INSTALL_REQUIRES,
     classifiers=CLASSIFIERS)

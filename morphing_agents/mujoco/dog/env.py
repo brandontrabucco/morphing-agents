@@ -8,6 +8,7 @@ import tempfile
 import xml.etree.ElementTree as ET
 import os
 import gym
+import pkg_resources
 
 
 class DogEnv(mujoco_env.MujocoEnv, utils.EzPickle):
@@ -33,9 +34,8 @@ class DogEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         self.expose_design = expose_design
 
         # load the base agent xml file
-        xml_name = 'base.xml'
-        xml_path = os.path.join(
-            os.path.dirname(os.path.abspath(__file__)), xml_name)
+        xml_path = pkg_resources.resource_filename(
+            'morphing_agents', 'mujoco/dog/base.xml')
 
         # find the agent body and add elements to it
         tree = ET.parse(xml_path)
