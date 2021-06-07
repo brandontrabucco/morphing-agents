@@ -137,3 +137,26 @@ def normalize_design_vector(design_vector):
     lb = np.concatenate([lb for _ in range(num_legs)])
     return 2 * (design_vector - lb) / \
         np.clip(ub - lb, a_min=1e-5, a_max=None) - 1.0
+
+
+def denormalize_design_vector(design_vector):
+    """Normalize a design vector using the upper and lower bounds
+    of design elements of the agent
+
+    Args:
+
+    design_vector: np.array
+        a vector containing concatenated design elements
+
+    Returns:
+
+    design_vector: np.array
+        a vector containing concatenated normalized design elements
+    """
+
+    ub = np.array(list(LEG_UPPER_BOUND))
+    lb = np.array(list(LEG_LOWER_BOUND))
+    num_legs = len(design_vector) // len(ub)
+    ub = np.concatenate([ub for _ in range(num_legs)])
+    lb = np.concatenate([lb for _ in range(num_legs)])
+    return (design_vector + 1.0) / 2.0 * (ub - lb) + lb
