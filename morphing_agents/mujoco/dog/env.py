@@ -1,6 +1,7 @@
 from morphing_agents.mujoco.dog.designs import sample_centered
 from morphing_agents.mujoco.dog.designs import sample_uniformly
 from morphing_agents.mujoco.dog.designs import DEFAULT_DESIGN
+from morphing_agents.mujoco.dog.designs import normalize_design_vector
 from gym import utils
 from gym.envs.mujoco import mujoco_env
 import numpy as np
@@ -15,7 +16,8 @@ class DogEnv(mujoco_env.MujocoEnv, utils.EzPickle):
 
     def __init__(self,
                  design=DEFAULT_DESIGN,
-                 expose_design=True,):
+                 expose_design=True,
+                 normalize_design=True):
         """Build a Dog environment that has a parametric design for training
         morphology-conditioned agents
 
@@ -32,6 +34,7 @@ class DogEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         # save the design parameters as a vectorized array
         self.design = np.concatenate(design)
         self.expose_design = expose_design
+        self.normalize_design = normalize_design
 
         # load the base agent xml file
         xml_path = pkg_resources.resource_filename(
@@ -201,7 +204,10 @@ class DogEnv(mujoco_env.MujocoEnv, utils.EzPickle):
             self.sim.data.qvel.flat,
             np.clip(self.sim.data.cfrc_ext, -1, 1).flat]
         if self.expose_design:
-            obs_list.append(self.design)
+            design = self.design
+            if self.normalize_design:
+                design = normalize_design_vector(design)
+            obs_list.append(design)
         return np.concatenate(obs_list)
 
     def reset_model(self):

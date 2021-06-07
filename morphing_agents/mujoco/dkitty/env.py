@@ -1,6 +1,7 @@
 from morphing_agents.mujoco.dkitty.designs import DEFAULT_DESIGN
 from morphing_agents.mujoco.dkitty.designs import sample_centered
 from morphing_agents.mujoco.dkitty.designs import sample_uniformly
+from morphing_agents.mujoco.dkitty.designs import normalize_design_vector
 from morphing_agents.mujoco.utils import load_xml_tree
 
 from typing import Dict, Optional, Sequence, Tuple, Union
@@ -75,6 +76,7 @@ class DKittyEnv(BaseDKittyEnv):
                  sim_model,
                  design=DEFAULT_DESIGN,
                  expose_design=True,
+                 normalize_design=True,
                  observation_keys: Sequence[str] = DEFAULT_OBSERVATION_KEYS,
                  **kwargs):
         """Build a DKitty environment that has a parametric design for training
@@ -98,6 +100,7 @@ class DKittyEnv(BaseDKittyEnv):
         # save the design parameters as a vectorized array
         self._legs = design
         self.design = np.concatenate(design)
+        self.normalize_design = normalize_design
 
         # set design to be in observation keys
         observation_keys = list(observation_keys)
@@ -250,7 +253,8 @@ class DKittyEnv(BaseDKittyEnv):
 
     def _get_default_obs(self) -> Dict[str, np.ndarray]:
         """Returns a dictionary of default observations."""
-        return {'design': self.design}
+        return {'design': self.design if not self.normalize_design else
+                normalize_design_vector(self.design)}
 
     def _configure_robot(self, builder: RobotComponentBuilder):
         """Configures the robot component."""
